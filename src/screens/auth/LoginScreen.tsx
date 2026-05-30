@@ -42,7 +42,7 @@ export default function LoginScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.tagline}>Connect. Empower. Grow. Together.</Text>
+          <Text style={styles.tagline}>Connect. Empower. Grow</Text>
         </View>
 
         {/* Form */}
