@@ -4,10 +4,10 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
   ScrollView,
 } from "react-native";
 import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
 
 // ─── Fake Data ───────────────────────────────────────────────
@@ -160,26 +160,40 @@ function PostCard({ item }: { item: (typeof POSTS)[0] }) {
       {/* Post Actions */}
       <View style={styles.postActions}>
         <TouchableOpacity style={styles.actionBtn} onPress={handleLike}>
-          <Text style={[styles.actionIcon, liked && { color: colors.like }]}>
-            {liked ? "♥" : "♡"}
-          </Text>
+          <Ionicons
+            name={liked ? "heart" : "heart-outline"}
+            size={20}
+            color={liked ? colors.like : colors.textSecondary}
+          />
           <Text style={[styles.actionText, liked && { color: colors.like }]}>
             {likeCount}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionBtn}>
-          <Text style={styles.actionIcon}>💬</Text>
+          <Ionicons
+            name="chatbubble-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
           <Text style={styles.actionText}>{item.comments}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionBtn}>
-          <Text style={styles.actionIcon}>↺</Text>
+          <Ionicons
+            name="repeat-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
           <Text style={styles.actionText}>{item.shares}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionBtn}>
-          <Text style={styles.actionIcon}>↑</Text>
+          <Ionicons
+            name="share-social-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -192,17 +206,26 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.headerLogo}
-          resizeMode="contain"
-        />
+        <View style={styles.headerLeft}>
+          <View style={styles.headerAvatar}>
+            <Text style={styles.headerAvatarText}>SK</Text>
+          </View>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerName}>Sereti Kamau</Text>
+            <Text style={styles.headerHandle}>@sereti_k</Text>
+            <Text style={styles.headerMbogi}>12 Mbogi</Text>
+          </View>
+        </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity style={styles.headerIcon}>
-            <Text style={styles.headerIconText}>+</Text>
+            <Ionicons name="add" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerIcon}>
-            <Text style={styles.headerIconText}>✉</Text>
+            <Ionicons
+              name="mail-outline"
+              size={22}
+              color={colors.textPrimary}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -243,14 +266,50 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: 48,
-    paddingBottom: 8,
+    paddingBottom: 12,
     backgroundColor: colors.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  headerLogo: {
-    width: 100,
-    height: 40,
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  headerAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerAvatarText: {
+    fontSize: fonts.sizes.md,
+    fontWeight: fonts.weights.bold,
+    color: colors.primary,
+  },
+  headerInfo: {
+    justifyContent: "center",
+  },
+  headerName: {
+    fontSize: fonts.sizes.md,
+    fontWeight: fonts.weights.bold,
+    color: colors.textPrimary,
+    lineHeight: 18,
+  },
+  headerHandle: {
+    fontSize: fonts.sizes.xs,
+    color: colors.textMuted,
+    lineHeight: 16,
+  },
+  headerMbogi: {
+    fontSize: fonts.sizes.xs,
+    color: colors.primary,
+    fontWeight: fonts.weights.semibold,
+    lineHeight: 16,
   },
   headerIcons: {
     flexDirection: "row",
@@ -265,11 +324,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  headerIconText: {
-    fontSize: 18,
-    color: colors.textPrimary,
-    fontWeight: fonts.weights.bold,
   },
   storiesContainer: {
     backgroundColor: colors.white,
@@ -355,10 +409,6 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 4,
     paddingHorizontal: 8,
-  },
-  actionIcon: {
-    fontSize: 18,
-    color: colors.textSecondary,
   },
   actionText: {
     fontSize: fonts.sizes.sm,
