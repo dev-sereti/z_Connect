@@ -211,9 +211,9 @@ export default function HomeScreen() {
             <Text style={styles.headerAvatarText}>SK</Text>
           </View>
           <View style={styles.headerInfo}>
-            <Text style={styles.headerName}>Sereti Kamau</Text>
+            <Text style={styles.headerName}>Sereti</Text>
             <Text style={styles.headerHandle}>@sereti_k</Text>
-            <Text style={styles.headerMbogi}>12 Mbogi</Text>
+            <Text style={styles.headerMbogi}>12 Connections</Text>
           </View>
         </View>
         <View style={styles.headerIcons}>
