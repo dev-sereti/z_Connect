@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
 
-// ─── Fake Data ───────────────────────────────────────────────
+//  Fake Data ─
 const STORIES = [
   { id: "1", name: "You", initials: "Y" },
   { id: "2", name: "Amina", initials: "AM" },
@@ -79,7 +79,7 @@ const POSTS = [
   },
 ];
 
-// ─── Avatar ───────────────────────────────────────────────────
+//  Avatar
 function Avatar({
   initials,
   size = 44,
@@ -109,7 +109,7 @@ function Avatar({
   );
 }
 
-// ─── Story Item ───────────────────────────────────────────────
+//  Story Item ─
 function StoryItem({ item }: { item: (typeof STORIES)[0] }) {
   return (
     <TouchableOpacity style={styles.storyItem}>
@@ -119,7 +119,7 @@ function StoryItem({ item }: { item: (typeof STORIES)[0] }) {
   );
 }
 
-// ─── Post Card ────────────────────────────────────────────────
+//  Post Card
 function PostCard({ item }: { item: (typeof POSTS)[0] }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likes);
@@ -200,7 +200,7 @@ function PostCard({ item }: { item: (typeof POSTS)[0] }) {
   );
 }
 
-// ─── Home Screen ──────────────────────────────────────────────
+//  Home Screen
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
@@ -254,7 +254,7 @@ export default function HomeScreen() {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────
+//  Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
