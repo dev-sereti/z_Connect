@@ -6,7 +6,7 @@ import MainNavigator from "./MainNavigator";
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-  const isLoggedIn = false; // we will replace this with real auth later
+  const isLoggedIn = true;
 
   return (
     <NavigationContainer>
