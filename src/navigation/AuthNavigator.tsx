@@ -4,7 +4,7 @@ import RegisterScreen from "../screens/auth/RegisterScreen";
 import OTPScreen from "../screens/auth/OTPScreen";
 
 type Props = {
-  onLogin: () => void;
+  onLogin: (phone: string) => void;
 };
 
 const Stack = createNativeStackNavigator();

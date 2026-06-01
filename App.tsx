@@ -1,14 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AuthNavigator from "./src/navigation/AuthNavigator";
 import MainNavigator from "./src/navigation/MainNavigator";
+import { useAuthStore } from "./src/store";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, login } = useAuthStore();
 
   return (
     <NavigationContainer>
@@ -17,7 +17,7 @@ export default function App() {
           <Stack.Screen name="Main" component={MainNavigator} />
         ) : (
           <Stack.Screen name="Auth">
-            {() => <AuthNavigator onLogin={() => setIsLoggedIn(true)} />}
+            {() => <AuthNavigator onLogin={login} />}
           </Stack.Screen>
         )}
       </Stack.Navigator>

@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
+import { useAuthStore, usePostStore } from "../../store";
 
-//  Fake Data ─
+// ─── Stories ─────────────────────────────────────────────────
 const STORIES = [
   { id: "1", name: "You", initials: "Y" },
   { id: "2", name: "Amina", initials: "AM" },
@@ -20,66 +20,7 @@ const STORIES = [
   { id: "6", name: "Aisha", initials: "AK" },
 ];
 
-const POSTS = [
-  {
-    id: "1",
-    user: "Amina Wanjiru",
-    handle: "@amina_w",
-    initials: "AW",
-    time: "2m ago",
-    content:
-      "Just got accepted into the ALX Africa Software Engineering program! If you are a Kenyan youth looking to break into tech, apply now. Deadline is this Friday. #ALX #KenyanYouth #Tech",
-    likes: 142,
-    comments: 38,
-    shares: 21,
-    tag: "Opportunity",
-    tagColor: colors.primary,
-  },
-  {
-    id: "2",
-    user: "Kamau Njoroge",
-    handle: "@kamau_dev",
-    initials: "KN",
-    time: "15m ago",
-    content:
-      "Built my first React Native app today using zConnect as inspiration. The Kenyan tech scene is on fire right now. Who else is building something? Drop your project below. #BuildInPublic",
-    likes: 89,
-    comments: 24,
-    shares: 12,
-    tag: "Tech",
-    tagColor: colors.info,
-  },
-  {
-    id: "3",
-    user: "Zawadi Ochieng",
-    handle: "@zawadi_o",
-    initials: "ZO",
-    time: "1h ago",
-    content:
-      "Reminder: The Youth Enterprise Fund applications close next week. Up to KES 500,000 available for young entrepreneurs aged 18-35. Do not sleep on this opportunity! #YEF #KenyanEntrepreneur",
-    likes: 310,
-    comments: 67,
-    shares: 89,
-    tag: "Finance",
-    tagColor: colors.warning,
-  },
-  {
-    id: "4",
-    user: "Brian Otieno",
-    handle: "@brian_otieno",
-    initials: "BO",
-    time: "3h ago",
-    content:
-      "Thread: 10 free online certifications that Kenyan employers actually value in 2024.\n\n1. Google Digital Skills for Africa\n2. Cisco Networking Academy\n3. HubSpot Marketing\n\n#CareerTips #Kenya",
-    likes: 521,
-    comments: 103,
-    shares: 214,
-    tag: "Career",
-    tagColor: colors.accent,
-  },
-];
-
-//  Avatar
+// ─── Avatar ───────────────────────────────────────────────────
 function Avatar({
   initials,
   size = 44,
@@ -109,7 +50,7 @@ function Avatar({
   );
 }
 
-//  Story Item ─
+// ─── Story Item ───────────────────────────────────────────────
 function StoryItem({ item }: { item: (typeof STORIES)[0] }) {
   return (
     <TouchableOpacity style={styles.storyItem}>
@@ -119,19 +60,12 @@ function StoryItem({ item }: { item: (typeof STORIES)[0] }) {
   );
 }
 
-//  Post Card
-function PostCard({ item }: { item: (typeof POSTS)[0] }) {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(item.likes);
-
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
-  };
+// ─── Post Card ────────────────────────────────────────────────
+function PostCard({ item }: { item: any }) {
+  const { likePost } = usePostStore();
 
   return (
     <View style={styles.postCard}>
-      {/* Post Header */}
       <View style={styles.postHeader}>
         <Avatar initials={item.initials} size={44} />
         <View style={styles.postMeta}>
@@ -154,19 +88,22 @@ function PostCard({ item }: { item: (typeof POSTS)[0] }) {
         </View>
       </View>
 
-      {/* Post Content */}
       <Text style={styles.postContent}>{item.content}</Text>
 
-      {/* Post Actions */}
       <View style={styles.postActions}>
-        <TouchableOpacity style={styles.actionBtn} onPress={handleLike}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => likePost(item.id)}
+        >
           <Ionicons
-            name={liked ? "heart" : "heart-outline"}
+            name={item.liked ? "heart" : "heart-outline"}
             size={20}
-            color={liked ? colors.like : colors.textSecondary}
+            color={item.liked ? colors.like : colors.textSecondary}
           />
-          <Text style={[styles.actionText, liked && { color: colors.like }]}>
-            {likeCount}
+          <Text
+            style={[styles.actionText, item.liked && { color: colors.like }]}
+          >
+            {item.likes}
           </Text>
         </TouchableOpacity>
 
@@ -200,20 +137,29 @@ function PostCard({ item }: { item: (typeof POSTS)[0] }) {
   );
 }
 
-//  Home Screen
+// ─── Home Screen ──────────────────────────────────────────────
 export default function HomeScreen() {
+  const { user } = useAuthStore();
+  const { posts } = usePostStore();
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.headerAvatar}>
-            <Text style={styles.headerAvatarText}>SK</Text>
+            <Text style={styles.headerAvatarText}>
+              {user?.initials ?? "SK"}
+            </Text>
           </View>
           <View style={styles.headerInfo}>
-            <Text style={styles.headerName}>Sereti</Text>
-            <Text style={styles.headerHandle}>@sereti_k</Text>
-            <Text style={styles.headerMbogi}>12 Connections</Text>
+            <Text style={styles.headerName}>
+              {user?.name ?? "Sereti Kamau"}
+            </Text>
+            <Text style={styles.headerHandle}>
+              {user?.handle ?? "@sereti_k"}
+            </Text>
+            <Text style={styles.headerMbogi}>{user?.mbogi ?? 0} Mbogi</Text>
           </View>
         </View>
         <View style={styles.headerIcons}>
@@ -231,12 +177,11 @@ export default function HomeScreen() {
       </View>
 
       <FlatList
-        data={POSTS}
+        data={posts}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <>
-            {/* Stories */}
             <View style={styles.storiesContainer}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {STORIES.map((story) => (
@@ -254,7 +199,7 @@ export default function HomeScreen() {
   );
 }
 
-//  Styles
+// ─── Styles ───────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,

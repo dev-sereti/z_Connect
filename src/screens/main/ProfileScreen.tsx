@@ -4,38 +4,25 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ScrollView,
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
+import { useAuthStore } from "../../store";
 
-// ─── Fake Data
-const PROFILE = {
-  name: "Sereti",
-  handle: "@sereti_k",
-  initials: "SK",
-  bio: "Kenyan youth | Tech enthusiast | Building zConnect for the next generation of Kenyan innovators. Connect. Empower. Grow",
-  location: "Nairobi, Kenya",
-  joined: "Joined May 2026",
-  posts: 48,
-  mbogi: 312,
-  following: 189,
-};
-
-const PROFILE_TABS = ["Posts", "Replies", "Likes"];
-
+// ─── Fake Posts ───────────────────────────────────────────────
 const USER_POSTS = [
   {
     id: "1",
     content:
-      "Just launched zConnect, a social platform for Kenyan youth to share ideas, opportunities and stories. We are building something special for the next generation. #zConnect #KenyanYouth",
+      "Just launched zConnect — a social platform for Kenyan youth to share ideas, opportunities and stories. We are building something special for the next generation. #zConnect #KenyanYouth",
     likes: 234,
     comments: 56,
     shares: 89,
     time: "1d ago",
     tag: "Tech",
     tagColor: colors.info,
+    liked: false,
   },
   {
     id: "2",
@@ -47,6 +34,7 @@ const USER_POSTS = [
     time: "3d ago",
     tag: "Career",
     tagColor: colors.accent,
+    liked: false,
   },
   {
     id: "3",
@@ -58,10 +46,13 @@ const USER_POSTS = [
     time: "1w ago",
     tag: "Opportunity",
     tagColor: colors.primary,
+    liked: false,
   },
 ];
 
-// ─── Avatar ────
+const PROFILE_TABS = ["Posts", "Replies", "Likes"];
+
+// ─── Avatar ───────────────────────────────────────────────────
 function Avatar({ initials, size = 44 }: { initials: string; size?: number }) {
   return (
     <View
@@ -77,9 +68,9 @@ function Avatar({ initials, size = 44 }: { initials: string; size?: number }) {
   );
 }
 
-// ─── Post Card ─
+// ─── Post Card ────────────────────────────────────────────────
 function PostCard({ item }: { item: (typeof USER_POSTS)[0] }) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(item.liked);
   const [likeCount, setLikeCount] = useState(item.likes);
 
   return (
@@ -143,6 +134,7 @@ function PostCard({ item }: { item: (typeof USER_POSTS)[0] }) {
 // ─── Profile Screen ───────────────────────────────────────────
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("Posts");
+  const { user, logout } = useAuthStore();
 
   return (
     <View style={styles.container}>
@@ -167,10 +159,9 @@ export default function ProfileScreen() {
 
             {/* Profile Info */}
             <View style={styles.profileSection}>
-              {/* Avatar row */}
               <View style={styles.avatarRow}>
                 <View style={styles.avatarBorder}>
-                  <Avatar initials={PROFILE.initials} size={80} />
+                  <Avatar initials={user?.initials ?? "SK"} size={80} />
                 </View>
                 <View style={styles.profileActions}>
                   <TouchableOpacity style={styles.editBtn}>
@@ -188,17 +179,24 @@ export default function ProfileScreen() {
                       color={colors.textSecondary}
                     />
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+                    <Ionicons
+                      name="log-out-outline"
+                      size={18}
+                      color={colors.error}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
 
-              {/* Name & handle */}
-              <Text style={styles.profileName}>{PROFILE.name}</Text>
-              <Text style={styles.profileHandle}>{PROFILE.handle}</Text>
+              <Text style={styles.profileName}>
+                {user?.name ?? "Sereti Kamau"}
+              </Text>
+              <Text style={styles.profileHandle}>
+                {user?.handle ?? "@sereti_k"}
+              </Text>
+              <Text style={styles.profileBio}>{user?.bio ?? ""}</Text>
 
-              {/* Bio */}
-              <Text style={styles.profileBio}>{PROFILE.bio}</Text>
-
-              {/* Location & joined */}
               <View style={styles.profileMeta}>
                 <View style={styles.metaItem}>
                   <Ionicons
@@ -206,7 +204,9 @@ export default function ProfileScreen() {
                     size={14}
                     color={colors.textMuted}
                   />
-                  <Text style={styles.metaText}>{PROFILE.location}</Text>
+                  <Text style={styles.metaText}>
+                    {user?.location ?? "Nairobi, Kenya"}
+                  </Text>
                 </View>
                 <View style={styles.metaItem}>
                   <Ionicons
@@ -214,24 +214,25 @@ export default function ProfileScreen() {
                     size={14}
                     color={colors.textMuted}
                   />
-                  <Text style={styles.metaText}>{PROFILE.joined}</Text>
+                  <Text style={styles.metaText}>
+                    {user?.joined ?? "Joined 2024"}
+                  </Text>
                 </View>
               </View>
 
-              {/* Stats */}
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{PROFILE.posts}</Text>
+                  <Text style={styles.statNumber}>{user?.posts ?? 0}</Text>
                   <Text style={styles.statLabel}>Posts</Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{PROFILE.mbogi}</Text>
+                  <Text style={styles.statNumber}>{user?.mbogi ?? 0}</Text>
                   <Text style={styles.statLabel}>Mbogi</Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{PROFILE.following}</Text>
+                  <Text style={styles.statNumber}>{user?.following ?? 0}</Text>
                   <Text style={styles.statLabel}>Following</Text>
                 </View>
               </View>
@@ -258,22 +259,12 @@ export default function ProfileScreen() {
             </View>
           </>
         }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons
-              name="document-text-outline"
-              size={48}
-              color={colors.textMuted}
-            />
-            <Text style={styles.emptyText}>No posts yet</Text>
-          </View>
-        }
       />
     </View>
   );
 }
 
-// ─── Styles ────
+// ─── Styles ───────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -349,6 +340,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1.5,
     borderColor: colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoutBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: colors.error,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -487,15 +487,5 @@ const styles = StyleSheet.create({
   divider: {
     height: 8,
     backgroundColor: colors.background,
-  },
-  emptyContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 60,
-    gap: 12,
-  },
-  emptyText: {
-    fontSize: fonts.sizes.md,
-    color: colors.textMuted,
   },
 });

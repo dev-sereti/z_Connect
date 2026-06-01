@@ -17,13 +17,13 @@ import { colors, fonts } from "../../constants";
 const OTP_LENGTH = 6;
 
 type Props = {
-  onLogin: () => void;
+  onLogin: (phone: string) => void;
 };
 
 export default function OTPScreen({ onLogin }: Props) {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { phone, mode } = route.params;
+  const { phone } = route.params;
 
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
@@ -72,7 +72,7 @@ export default function OTPScreen({ onLogin }: Props) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      onLogin();
+      onLogin(phone);
     }, 1500);
   };
 
@@ -95,7 +95,6 @@ export default function OTPScreen({ onLogin }: Props) {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Back button */}
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
@@ -103,7 +102,6 @@ export default function OTPScreen({ onLogin }: Props) {
           <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
 
-        {/* Logo */}
         <View style={styles.logoContainer}>
           <Image
             source={require("../../assets/images/logo.png")}
@@ -112,14 +110,12 @@ export default function OTPScreen({ onLogin }: Props) {
           />
         </View>
 
-        {/* Heading */}
         <View style={styles.headingContainer}>
           <Text style={styles.heading}>Verify your number</Text>
           <Text style={styles.subheading}>We sent a 6-digit code to</Text>
           <Text style={styles.phone}>{phone}</Text>
         </View>
 
-        {/* OTP Inputs */}
         <View style={styles.otpRow}>
           {Array(OTP_LENGTH)
             .fill(0)
@@ -145,7 +141,6 @@ export default function OTPScreen({ onLogin }: Props) {
             ))}
         </View>
 
-        {/* Verify Button */}
         <TouchableOpacity
           style={[
             styles.verifyBtn,
@@ -159,7 +154,6 @@ export default function OTPScreen({ onLogin }: Props) {
           </Text>
         </TouchableOpacity>
 
-        {/* Resend */}
         <View style={styles.resendRow}>
           <Text style={styles.resendText}>Didn't receive the code? </Text>
           <TouchableOpacity onPress={handleResend} disabled={!canResend}>
@@ -174,7 +168,6 @@ export default function OTPScreen({ onLogin }: Props) {
           </TouchableOpacity>
         </View>
 
-        {/* Wrong number */}
         <TouchableOpacity
           style={styles.wrongNumber}
           onPress={() => navigation.goBack()}
