@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
+import { useAuthStore, usePostStore } from "../../store";
 
 // ─── Post Types ───────────────────────────────────────────────
 const POST_TYPES = [
@@ -30,6 +31,9 @@ const POST_TYPES = [
 const MAX_CHARS = 280;
 
 export default function PostScreen() {
+  const { user } = useAuthStore();
+  const { addPost } = usePostStore();
+
   const [content, setContent] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [posting, setPosting] = useState(false);
@@ -39,15 +43,25 @@ export default function PostScreen() {
   const isNearLimit = charsLeft <= 30;
   const isOverLimit = charsLeft < 0;
 
+  const selectedTypeData = POST_TYPES.find((t) => t.label === selectedType);
+
   const handlePost = () => {
-    if (!isValid || isOverLimit) return;
+    if (!isValid || isOverLimit || !user) return;
     setPosting(true);
     setTimeout(() => {
+      addPost({
+        user: user.name,
+        handle: user.handle,
+        initials: user.initials,
+        time: "Just now",
+        content: content.trim(),
+        tag: selectedType,
+        tagColor: selectedTypeData?.color ?? colors.primary,
+      });
       setPosting(false);
       setContent("");
       setSelectedType("");
-      alert("Post shared with your Mbogi!");
-    }, 1500);
+    }, 1000);
   };
 
   return (
@@ -77,11 +91,15 @@ export default function PostScreen() {
           {/* User Row */}
           <View style={styles.userRow}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>SK</Text>
+              <Text style={styles.avatarText}>{user?.initials ?? "SK"}</Text>
             </View>
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>Sereti</Text>
-              <Text style={styles.userHandle}>@sereti_k</Text>
+              <Text style={styles.userName}>
+                {user?.name ?? "Sereti Kamau"}
+              </Text>
+              <Text style={styles.userHandle}>
+                {user?.handle ?? "@sereti_k"}
+              </Text>
             </View>
           </View>
 
