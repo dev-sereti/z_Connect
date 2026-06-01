@@ -10,11 +10,17 @@ import {
   Image,
 } from "react-native";
 import { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { colors, fonts } from "../../constants";
 
+type AuthStackParams = {
+  Login: undefined;
+  Register: undefined;
+  OTP: { phone: string; mode: string };
+};
+
 export default function LoginScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<AuthStackParams>>();
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +28,10 @@ export default function LoginScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      alert("OTP sent to +254" + phone);
+      navigation.navigate("OTP", {
+        phone: "+254" + phone,
+        mode: "login",
+      });
     }, 1500);
   };
 
@@ -42,7 +51,7 @@ export default function LoginScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.tagline}>Connect. Empower. Grow</Text>
+          <Text style={styles.tagline}>Connect. Empower. Grow. Together.</Text>
         </View>
 
         {/* Form */}
