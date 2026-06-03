@@ -1,13 +1,16 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/main/HomeScreen";
 import ExploreScreen from "../screens/main/ExploreScreen";
 import PostScreen from "../screens/main/PostScreen";
 import NotificationsScreen from "../screens/main/NotificationsScreen";
 import ProfileScreen from "../screens/main/ProfileScreen";
+import EditProfileScreen from "../screens/main/EditProfileScreen";
 import { colors } from "../constants";
 
 const Tab = createBottomTabNavigator();
+const ProfileStack = createNativeStackNavigator();
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -15,28 +18,24 @@ const TAB_ICONS: Record<
   string,
   { active: IoniconsName; inactive: IoniconsName }
 > = {
-  Home: {
-    active: "home",
-    inactive: "home-outline",
-  },
-  Explore: {
-    active: "compass",
-    inactive: "compass-outline",
-  },
-  Post: {
-    active: "add-circle",
-    inactive: "add-circle-outline",
-  },
-  Notifications: {
-    active: "notifications",
-    inactive: "notifications-outline",
-  },
-  Profile: {
-    active: "person",
-    inactive: "person-outline",
-  },
+  Home: { active: "home", inactive: "home-outline" },
+  Explore: { active: "compass", inactive: "compass-outline" },
+  Post: { active: "add-circle", inactive: "add-circle-outline" },
+  Notifications: { active: "notifications", inactive: "notifications-outline" },
+  Profile: { active: "person", inactive: "person-outline" },
 };
 
+// ─── Profile Stack ────────────────────────────────────────────
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+    </ProfileStack.Navigator>
+  );
+}
+
+// ─── Main Navigator ───────────────────────────────────────────
 export default function MainNavigator() {
   return (
     <Tab.Navigator
@@ -62,7 +61,7 @@ export default function MainNavigator() {
       <Tab.Screen name="Explore" component={ExploreScreen} />
       <Tab.Screen name="Post" component={PostScreen} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
 }

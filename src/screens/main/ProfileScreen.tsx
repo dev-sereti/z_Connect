@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
 import { useAuthStore } from "../../store";
@@ -135,6 +136,7 @@ function PostCard({ item }: { item: (typeof USER_POSTS)[0] }) {
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("Posts");
   const { user, logout } = useAuthStore();
+  const navigation = useNavigation<any>();
 
   return (
     <View style={styles.container}>
@@ -164,7 +166,10 @@ export default function ProfileScreen() {
                   <Avatar initials={user?.initials ?? "SK"} size={80} />
                 </View>
                 <View style={styles.profileActions}>
-                  <TouchableOpacity style={styles.editBtn}>
+                  <TouchableOpacity
+                    style={styles.editBtn}
+                    onPress={() => navigation.navigate("EditProfile")}
+                  >
                     <Ionicons
                       name="pencil-outline"
                       size={16}
@@ -195,29 +200,32 @@ export default function ProfileScreen() {
               <Text style={styles.profileHandle}>
                 {user?.handle ?? "@sereti_k"}
               </Text>
-              <Text style={styles.profileBio}>{user?.bio ?? ""}</Text>
+
+              {user?.bio ? (
+                <Text style={styles.profileBio}>{user.bio}</Text>
+              ) : null}
 
               <View style={styles.profileMeta}>
-                <View style={styles.metaItem}>
-                  <Ionicons
-                    name="location-outline"
-                    size={14}
-                    color={colors.textMuted}
-                  />
-                  <Text style={styles.metaText}>
-                    {user?.location ?? "Nairobi, Kenya"}
-                  </Text>
-                </View>
-                <View style={styles.metaItem}>
-                  <Ionicons
-                    name="calendar-outline"
-                    size={14}
-                    color={colors.textMuted}
-                  />
-                  <Text style={styles.metaText}>
-                    {user?.joined ?? "Joined 2024"}
-                  </Text>
-                </View>
+                {user?.location ? (
+                  <View style={styles.metaItem}>
+                    <Ionicons
+                      name="location-outline"
+                      size={14}
+                      color={colors.textMuted}
+                    />
+                    <Text style={styles.metaText}>{user.location}</Text>
+                  </View>
+                ) : null}
+                {user?.joined ? (
+                  <View style={styles.metaItem}>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={14}
+                      color={colors.textMuted}
+                    />
+                    <Text style={styles.metaText}>{user.joined}</Text>
+                  </View>
+                ) : null}
               </View>
 
               <View style={styles.statsRow}>
@@ -258,6 +266,16 @@ export default function ProfileScreen() {
               ))}
             </View>
           </>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons
+              name="document-text-outline"
+              size={48}
+              color={colors.textMuted}
+            />
+            <Text style={styles.emptyText}>No posts yet</Text>
+          </View>
         }
       />
     </View>
@@ -373,6 +391,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 16,
     marginBottom: 16,
+    flexWrap: "wrap",
   },
   metaItem: {
     flexDirection: "row",
@@ -487,5 +506,15 @@ const styles = StyleSheet.create({
   divider: {
     height: 8,
     backgroundColor: colors.background,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 60,
+    gap: 12,
+  },
+  emptyText: {
+    fontSize: fonts.sizes.md,
+    color: colors.textMuted,
   },
 });
