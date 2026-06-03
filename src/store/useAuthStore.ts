@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+// ─── Types ────────────────────────────────────────────────────
 type User = {
   id: string;
   name: string;
@@ -22,29 +23,31 @@ type AuthState = {
   updateUser: (data: Partial<User>) => void;
 };
 
+// ─── Default User ─────────────────────────────────────────────
 const DEFAULT_USER: User = {
   id: "1",
-  name: "Sereti Kamau",
-  handle: "@sereti_k",
-  initials: "SK",
+  name: "",
+  handle: "",
+  initials: "",
   phone: "",
-  bio: "Kenyan youth | Tech enthusiast | Building zConnect for the next generation of Kenyan innovators. Connect. Empower. Grow. Together.",
-  location: "Nairobi, Kenya",
-  joined: "Joined May 2024",
-  posts: 48,
-  mbogi: 312,
-  following: 189,
+  bio: "",
+  location: "",
+  joined: "",
+  posts: 0,
+  mbogi: 0,
+  following: 0,
 };
 
+// ─── Store ────────────────────────────────────────────────────
 const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
   user: null,
 
   login: (phone: string) =>
-    set({
+    set((state) => ({
       isLoggedIn: true,
-      user: { ...DEFAULT_USER, phone },
-    }),
+      user: state.user ? { ...state.user, phone } : { ...DEFAULT_USER, phone },
+    })),
 
   logout: () =>
     set({
@@ -54,7 +57,9 @@ const useAuthStore = create<AuthState>((set) => ({
 
   updateUser: (data: Partial<User>) =>
     set((state) => ({
-      user: state.user ? { ...state.user, ...data } : null,
+      user: state.user
+        ? { ...state.user, ...data }
+        : { ...DEFAULT_USER, ...data },
     })),
 }));
 

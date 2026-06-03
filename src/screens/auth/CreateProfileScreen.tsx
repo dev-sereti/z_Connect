@@ -1,41 +1,37 @@
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
+  TextInput,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Image,
 } from "react-native";
 import { useState } from "react";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
 import { useAuthStore } from "../../store";
 
-type AuthStackParams = {
-  Login: undefined;
-  Register: undefined;
-  OTP: { phone: string; mode: string; profile?: object };
+type Props = {
+  onLogin: (phone: string) => void;
 };
 
-export default function RegisterScreen() {
-  const navigation = useNavigation<NavigationProp<AuthStackParams>>();
+export default function CreateProfileScreen({ onLogin }: Props) {
+  const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const { phone } = route.params;
+  const { updateUser } = useAuthStore();
 
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
-  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
-  const { updateUser } = useAuthStore();
 
-  const isValid =
-    fullName.trim().length > 0 &&
-    username.trim().length > 0 &&
-    phone.trim().length === 9;
+  const isValid = fullName.trim().length > 0 && username.trim().length > 0;
 
   const getInitials = (name: string) => {
     const parts = name.trim().split(" ");
@@ -45,31 +41,28 @@ export default function RegisterScreen() {
     return parts[0].slice(0, 2).toUpperCase();
   };
 
-  const handleRegister = () => {
+  const handleCreate = () => {
     if (!isValid) return;
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      navigation.navigate("OTP", {
-        phone: "+254" + phone,
-        mode: "register",
-        profile: {
-          name: fullName.trim(),
-          handle: "@" + username.trim().toLowerCase(),
-          initials: getInitials(fullName),
-          phone: "+254" + phone,
-          bio: bio.trim(),
-          location: location.trim() || "Kenya",
-          joined:
-            "Joined " +
-            new Date().toLocaleString("default", {
-              month: "long",
-              year: "numeric",
-            }),
-          posts: 0,
-          mbogi: 0,
-          following: 0,
-        },
+      onLogin(phone);
+      updateUser({
+        name: fullName.trim(),
+        handle: "@" + username.trim().toLowerCase(),
+        initials: getInitials(fullName),
+        phone,
+        bio: bio.trim(),
+        location: location.trim() || "Kenya",
+        joined:
+          "Joined " +
+          new Date().toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          }),
+        posts: 0,
+        mbogi: 0,
+        following: 0,
       });
     }, 1000);
   };
@@ -83,6 +76,14 @@ export default function RegisterScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Back */}
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Image
@@ -94,15 +95,15 @@ export default function RegisterScreen() {
 
         {/* Heading */}
         <View style={styles.headingContainer}>
-          <Text style={styles.heading}>Create your account</Text>
-          <Text style={styles.subheading}>Join your Mbogi on zConnect</Text>
+          <Text style={styles.heading}>Create your profile</Text>
+          <Text style={styles.subheading}>Tell your Mbogi who you are</Text>
         </View>
 
         {/* Avatar Preview */}
         <View style={styles.avatarPreviewContainer}>
           <View style={styles.avatarPreview}>
             <Text style={styles.avatarPreviewText}>
-              {fullName ? getInitials(fullName) : "Z"}
+              {fullName ? getInitials(fullName) : "SK"}
             </Text>
           </View>
           <TouchableOpacity style={styles.avatarEditBtn}>
@@ -158,7 +159,7 @@ export default function RegisterScreen() {
           </Text>
           <TextInput
             style={[styles.input, styles.bioInput]}
-            placeholder="Tell your Mbogi about yourself..."
+            placeholder="Tell your Mbogi a little about yourself..."
             placeholderTextColor={colors.textMuted}
             value={bio}
             onChangeText={setBio}
@@ -188,23 +189,19 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Phone */}
-          <Text style={styles.label}>
-            Phone number <Text style={styles.required}>*</Text>
-          </Text>
-          <View style={styles.phoneRow}>
-            <View style={styles.countryCode}>
-              <Text style={styles.countryCodeText}>🇰🇪 +254</Text>
+          {/* Phone — readonly */}
+          <Text style={styles.label}>Phone number</Text>
+          <View style={styles.phoneReadonly}>
+            <Ionicons name="call-outline" size={18} color={colors.textMuted} />
+            <Text style={styles.phoneReadonlyText}>{phone}</Text>
+            <View style={styles.verifiedBadge}>
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={colors.primary}
+              />
+              <Text style={styles.verifiedText}>Verified</Text>
             </View>
-            <TextInput
-              style={styles.phoneInput}
-              placeholder="7XX XXX XXX"
-              placeholderTextColor={colors.textMuted}
-              keyboardType="phone-pad"
-              value={phone}
-              onChangeText={setPhone}
-              maxLength={9}
-            />
           </View>
         </View>
 
@@ -214,11 +211,11 @@ export default function RegisterScreen() {
             styles.createBtn,
             (!isValid || loading) && styles.createBtnDisabled,
           ]}
-          onPress={handleRegister}
+          onPress={handleCreate}
           disabled={!isValid || loading}
         >
           <Text style={styles.createBtnText}>
-            {loading ? "Sending OTP..." : "Create account"}
+            {loading ? "Creating your profile..." : "Join zConnect"}
           </Text>
         </TouchableOpacity>
 
@@ -226,14 +223,6 @@ export default function RegisterScreen() {
           By joining, you agree to zConnect's Terms of Service and Privacy
           Policy.
         </Text>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={styles.footerLink}>Sign in</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -250,13 +239,24 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+  },
   logoContainer: {
     alignItems: "center",
     marginBottom: 16,
   },
   logo: {
-    width: 140,
-    height: 140,
+    width: 120,
+    height: 120,
   },
   headingContainer: {
     alignItems: "center",
@@ -385,34 +385,31 @@ const styles = StyleSheet.create({
     fontSize: fonts.sizes.base,
     color: colors.textPrimary,
   },
-  phoneRow: {
+  phoneReadonly: {
     flexDirection: "row",
-    gap: 8,
-  },
-  countryCode: {
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    justifyContent: "center",
     alignItems: "center",
-  },
-  countryCodeText: {
-    fontSize: fonts.sizes.md,
-    color: colors.textPrimary,
-    fontWeight: fonts.weights.medium,
-  },
-  phoneInput: {
-    flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    gap: 8,
+  },
+  phoneReadonlyText: {
+    flex: 1,
     fontSize: fonts.sizes.base,
-    color: colors.textPrimary,
+    color: colors.textSecondary,
+  },
+  verifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  verifiedText: {
+    fontSize: fonts.sizes.xs,
+    color: colors.primary,
+    fontWeight: fonts.weights.semibold,
   },
   createBtn: {
     backgroundColor: colors.primary,
@@ -434,20 +431,5 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: "center",
     lineHeight: 18,
-    marginBottom: 24,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: fonts.sizes.sm,
-    color: colors.textSecondary,
-  },
-  footerLink: {
-    fontSize: fonts.sizes.sm,
-    fontWeight: fonts.weights.bold,
-    color: colors.primary,
   },
 });

@@ -13,6 +13,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
+import { useAuthStore } from "../../store";
 
 const OTP_LENGTH = 6;
 
@@ -24,6 +25,7 @@ export default function OTPScreen({ onLogin }: Props) {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { phone } = route.params;
+  const { updateUser } = useAuthStore();
 
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,9 @@ export default function OTPScreen({ onLogin }: Props) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      if (route.params?.profile) {
+        updateUser(route.params.profile);
+      }
       onLogin(phone);
     }, 1500);
   };
