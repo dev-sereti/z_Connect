@@ -9,6 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
 import { useAuthStore, usePostStore } from "../../store";
@@ -31,6 +32,7 @@ const POST_TYPES = [
 const MAX_CHARS = 280;
 
 export default function PostScreen() {
+  const navigation = useNavigation<any>();
   const { user } = useAuthStore();
   const { addPost } = usePostStore();
 
@@ -61,6 +63,9 @@ export default function PostScreen() {
       setPosting(false);
       setContent("");
       setSelectedType("");
+
+      // Navigate to Home tab after posting
+      navigation.navigate("Home");
     }, 1000);
   };
 
