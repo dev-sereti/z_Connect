@@ -6,9 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, fonts } from "../../constants";
 import { useAuthStore, usePostStore } from "../../store";
+import PostSkeleton from "../../components/feed/PostSkeleton";
 
 // ─── Stories ─────────────────────────────────────────────────
 const STORIES = [
@@ -141,6 +144,12 @@ function PostCard({ item }: { item: any }) {
 export default function HomeScreen() {
   const { user } = useAuthStore();
   const { posts } = usePostStore();
+  const navigation = useNavigation<any>();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1500);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -176,25 +185,58 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <>
-            <View style={styles.storiesContainer}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {STORIES.map((story) => (
-                  <StoryItem key={story.id} item={story} />
-                ))}
-              </ScrollView>
+      {/* Feed */}
+      {loading ? (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <PostSkeleton />
+          <View style={styles.divider} />
+          <PostSkeleton />
+          <View style={styles.divider} />
+          <PostSkeleton />
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <>
+              <View style={styles.storiesContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {STORIES.map((story) => (
+                    <StoryItem key={story.id} item={story} />
+                  ))}
+                </ScrollView>
+              </View>
+              <View style={styles.divider} />
+            </>
+          }
+          renderItem={({ item }) => <PostCard item={item} />}
+          ItemSeparatorComponent={() => <View style={styles.divider} />}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <View style={styles.emptyIconContainer}>
+                <Ionicons
+                  name="newspaper-outline"
+                  size={48}
+                  color={colors.primary}
+                />
+              </View>
+              <Text style={styles.emptyTitle}>No posts yet</Text>
+              <Text style={styles.emptyMessage}>
+                Be the first to share something with your Mbogi. Ideas,
+                opportunities, stories — anything goes.
+              </Text>
+              <TouchableOpacity
+                style={styles.emptyBtn}
+                onPress={() => navigation.navigate("Post")}
+              >
+                <Text style={styles.emptyBtnText}>Create a post</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.divider} />
-          </>
-        }
-        renderItem={({ item }) => <PostCard item={item} />}
-        ItemSeparatorComponent={() => <View style={styles.divider} />}
-      />
+          }
+        />
+      )}
     </View>
   );
 }
@@ -359,5 +401,46 @@ const styles = StyleSheet.create({
     fontSize: fonts.sizes.sm,
     color: colors.textSecondary,
     fontWeight: fonts.weights.medium,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 40,
+    paddingTop: 80,
+    paddingBottom: 40,
+  },
+  emptyIconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: colors.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: fonts.sizes.xl,
+    fontWeight: fonts.weights.bold,
+    color: colors.textPrimary,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  emptyMessage: {
+    fontSize: fonts.sizes.md,
+    color: colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  emptyBtn: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  emptyBtnText: {
+    fontSize: fonts.sizes.md,
+    fontWeight: fonts.weights.bold,
+    color: colors.white,
   },
 });
