@@ -1,25 +1,30 @@
 {
   "expo": {
-    "name": "zconnect",
+    "name": "zConnect",
     "slug": "zconnect",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/images/logo.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/images/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1DA462"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.zconnect.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./src/assets/images/logo.png",
+        "backgroundColor": "#1DA462"
       },
-      "predictiveBackGestureEnabled": false
+      "package": "com.zconnect.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./src/assets/images/logo.png"
+    },
+    "plugins": ["expo-font"]
   }
 }
